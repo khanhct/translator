@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Translator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-language"></i> Text Translator</h1>
+            <p>Translate your text to Vietnamese using AI</p>
+        </header>
+
+        <main class="translator-container">
+            <div class="input-section">
+                <h3><i class="fas fa-edit"></i> Input Text</h3>
+                <textarea 
+                    id="inputText" 
+                    placeholder="Enter the text you want to translate..."
+                    rows="6"
+                ></textarea>
+                <div class="button-group">
+                    <button id="translateBtn" class="btn btn-primary">
+                        <i class="fas fa-exchange-alt"></i> Translate
+                    </button>
+                    <button id="clearBtn" class="btn btn-secondary">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <h3><i class="fas fa-check-circle"></i> Translation Result</h3>
+                <textarea 
+                    id="outputText" 
+                    placeholder="Translation will appear here..."
+                    rows="6"
+                    readonly
+                ></textarea>
+                <div class="button-group">
+                    <button id="copyBtn" class="btn btn-success" disabled>
+                        <i class="fas fa-copy"></i> Copy Result
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Translating...</p>
+        </div>
+
+        <div id="notification" class="notification hidden"></div>
+
+        <footer>
+            <p>Powered by GPT-4.1 Translation API</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
