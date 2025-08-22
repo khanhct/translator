@@ -1,157 +1,150 @@
-# Text Translator Web App
+# Translator App
 
-A modern, responsive web application for translating text to Vietnamese using GPT-4.1 AI translation API.
+A web application for translating text using OpenAI GPT-4 API with multiple translation modes.
 
 ## Features
 
-- **Clean Interface**: Modern and intuitive user interface with responsive design
-- **Real-time Translation**: Translate text to Vietnamese using GPT-4.1 API
-- **Copy Functionality**: One-click copy of translated text to clipboard
-- **Keyboard Shortcuts**: Use Ctrl+Enter to quickly translate text
-- **Loading States**: Visual feedback during translation process
-- **Error Handling**: Comprehensive error handling with user-friendly messages
-- **Mobile Responsive**: Works seamlessly on desktop, tablet, and mobile devices
-
-## Technology Stack
-
-- **Backend**: Node.js with Express.js
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **API Integration**: Axios for HTTP requests
-- **Styling**: Modern CSS with gradients and animations
-- **Icons**: Font Awesome icons
+- **Multiple Translation Modes:**
+  - **Formal**: Professional and formal Vietnamese suitable for business documents
+  - **Casual**: Everyday conversational Vietnamese for informal communication
+  - **Technical**: Technical Vietnamese with specialized terminology for technical documents
+  - **Creative**: Creative and expressive Vietnamese for artistic and creative content
+- **OpenAI GPT-4 Integration**: High-quality translations using OpenAI's latest model
+- **Fallback Support**: Legacy GPT API endpoint for backup
+- **RESTful API**: Clean API endpoints for integration
+- **Modern Web Interface**: Responsive frontend with real-time translation
 
 ## Prerequisites
 
-- Node.js (version 14 or higher)
-- npm (Node Package Manager)
+- Node.js (v14 or higher)
+- OpenAI API key
 
-## Installation
+## Setup
 
-1. **Clone or download the project**
+1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
-   cd translator-app
+   git clone https://github.com/khanhct/translator.git
+   cd translator
    ```
 
-2. **Install dependencies**
+2. **Install dependencies:**
    ```bash
    npm install
    ```
 
-3. **Start the application**
-   ```bash
-   # For production
-   npm start
+3. **Configure OpenAI API:**
    
-   # For development (with auto-restart)
+   Create a `.env` file in the root directory:
+   ```bash
+   # OpenAI API Configuration
+   OPENAI_API_KEY=your-actual-openai-api-key-here
+   
+   # Server Configuration (optional)
+   PORT=3000
+   ```
+   
+   **Get your OpenAI API key:**
+   - Visit [OpenAI Platform](https://platform.openai.com/api-keys)
+   - Create a new API key
+   - Copy the key and paste it in your `.env` file
+
+4. **Start the application:**
+   ```bash
+   # Development mode with auto-reload
    npm run dev
+   
+   # Production mode
+   npm start
    ```
 
-4. **Open your browser**
+5. **Open your browser:**
    Navigate to `http://localhost:3000`
 
-## Usage
+## API Endpoints
 
-1. **Enter Text**: Type or paste the text you want to translate in the input box
-2. **Translate**: Click the "Translate" button or press `Ctrl+Enter`
-3. **Copy Result**: Click the "Copy Result" button to copy the translation to your clipboard
-4. **Clear**: Use the "Clear" button to reset both input and output fields
+### Get Available Translation Modes
+```
+GET /api/modes
+```
+Returns all available translation modes with descriptions.
 
-## API Configuration
-
-The application uses the GPT-4.1 translation API with the following configuration:
-
-- **Endpoint**: `https://gpt-api.niteco.se/api/chat-completion`
-- **API Key**: Pre-configured (replace in `server.js` if needed)
-- **Model**: GPT-4.1
-- **Target Language**: Vietnamese
-
-To modify the API configuration, edit the `server.js` file:
-
-```javascript
-// Update API endpoint or headers
-const response = await axios.post('YOUR_API_ENDPOINT', {
-    model: "gpt-4.1",
-    messages: [{ role: "user", content: prompt }],
-    stream: false
-}, {
-    headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': 'YOUR_API_KEY'
-    }
-});
+### Translate Text (OpenAI)
+```
+POST /api/translate
+```
+**Body:**
+```json
+{
+  "text": "Text to translate",
+  "targetLanguage": "vietnamese",
+  "mode": "formal"
+}
 ```
 
-## Project Structure
+**Available modes:** `formal`, `casual`, `technical`, `creative`
 
+### Translate Text (Legacy GPT API)
 ```
-translator-app/
-├── package.json          # Dependencies and scripts
-├── server.js            # Express.js server and API routes
-├── README.md            # Project documentation
-└── public/              # Static files
-    ├── index.html       # Main HTML file
-    ├── styles.css       # CSS styling
-    └── script.js        # Frontend JavaScript
+POST /api/translate/legacy
+```
+**Body:**
+```json
+{
+  "text": "Text to translate",
+  "targetLanguage": "vietnamese"
+}
 ```
 
-## Features in Detail
+## Translation Modes
 
-### User Interface
-- Gradient background with modern design
-- Card-based layout for input and output sections
-- Hover effects and smooth animations
-- Responsive grid layout that adapts to screen size
+### Formal Mode
+- **Use case**: Business documents, legal documents, professional communications
+- **Style**: Professional and formal Vietnamese vocabulary and grammar
+- **Output**: Clean, professional formatting suitable for document use
 
-### Functionality
-- Input validation to ensure text is provided
-- Loading spinner during API calls
-- Success/error notifications
-- Disabled states for better UX
-- Keyboard shortcut support
+### Casual Mode
+- **Use case**: Informal communication, social media, casual conversations
+- **Style**: Natural, conversational Vietnamese vocabulary and grammar
+- **Output**: Easy-to-read, natural language
 
-### Error Handling
-- Network error handling
-- API error responses
-- User-friendly error messages
-- Graceful fallbacks for clipboard functionality
+### Technical Mode
+- **Use case**: Technical documents, manuals, professional technical communications
+- **Style**: Technical Vietnamese vocabulary and terminology
+- **Output**: Technically accurate with specialized terminology
 
-## Browser Compatibility
+### Creative Mode
+- **Use case**: Artistic content, creative writing, expressive communications
+- **Style**: Creative and expressive Vietnamese vocabulary and grammar
+- **Output**: Engaging and artistic tone preservation
 
-- Chrome (recommended)
-- Firefox
-- Safari
-- Edge
-- Mobile browsers
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `OPENAI_API_KEY` | Your OpenAI API key | Required |
+| `PORT` | Server port number | 3000 |
+
+## Error Handling
+
+The API includes comprehensive error handling for:
+- Invalid API keys
+- Rate limiting
+- Network errors
+- Invalid translation modes
+- Missing text input
 
 ## Development
 
-To modify the application:
+- **Auto-reload**: Uses nodemon for development
+- **CORS enabled**: For frontend integration
+- **Static file serving**: Frontend files served from `public/` directory
 
-1. **Backend changes**: Edit `server.js` for API routes and server configuration
-2. **Frontend styling**: Edit `public/styles.css` for visual changes
-3. **Frontend functionality**: Edit `public/script.js` for interactive features
-4. **UI structure**: Edit `public/index.html` for layout changes
+## Security Notes
 
-## Troubleshooting
-
-### Common Issues
-
-1. **Port already in use**
-   - Change the port in `server.js`: `const PORT = process.env.PORT || 3001;`
-
-2. **API key errors**
-   - Verify the API key in `server.js` is correct
-   - Check if the API endpoint is accessible
-
-3. **Copy function not working**
-   - Ensure HTTPS is enabled for clipboard API (or use localhost)
-   - The app includes fallback for older browsers
+- Never commit your `.env` file (already in .gitignore)
+- Keep your OpenAI API key secure
+- Consider implementing rate limiting for production use
 
 ## License
 
-This project is open source and available under the MIT License.
-
-## Support
-
-For issues or questions, please refer to the project documentation or create an issue in the repository. 
+ISC 
