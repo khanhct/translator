@@ -399,3 +399,4 @@ dmypy.json
 
 # Cython
 cython_debug/
+node_modules

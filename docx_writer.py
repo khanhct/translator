@@ -93,7 +93,7 @@ class DocxWriter:
         
         # Normal text style
         normal_style = self.document.styles.add_style('CustomNormal', WD_STYLE_TYPE.PARAGRAPH)
-        normal_style.font.size = Pt(11)
+        normal_style.font.size = Pt(12)
         if has_space_after and hasattr(normal_style, 'space_after'):
             normal_style.space_after = Pt(6)
         
@@ -158,8 +158,6 @@ class DocxWriter:
             # ✅ FIXED: Save after EVERY chunk to ensure immediate persistence
             if self.output_path:
                 self._save_incremental_progress()
-                
-
         except Exception as e:
             raise
     
