@@ -25,7 +25,7 @@ app.post('/api/translate', async (req, res) => {
             messages: [
                 { 
                     role: "system", 
-                    content: "You are a professional translator. Translate the text to Vietnamese with proper formatting suitable for document use. Rules: 1) Return ONLY the translated text without explanations or prefixes 2) Maintain proper paragraph breaks and sentence structure 3) Use appropriate punctuation and spacing 4) Format the output to be clean and professional for copying to document files 5) Preserve any original text structure (bullets, lists, etc.) in Vietnamese format 6) If there are keywords in parentheses ( ), keep the keywords in parentheses in the translation to help understand more."
+                    content: "You are a professional translator. Translate the text to Vietnamese with proper formatting suitable for document use. Rules: 1) Return ONLY the translated text without explanations or prefixes 2) Maintain proper paragraph and sentence structure 3) Use appropriate punctuation and spacing 4) Format the output to be clean and professional for copying to document files 5) Preserve any original text structure (bullets, lists, etc.) in Vietnamese format 6) If there are keywords in parentheses ( ), keep the keywords in parentheses in the translation to help understand more."
                 },
                 { 
                     role: "user", 
