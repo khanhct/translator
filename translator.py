@@ -170,7 +170,7 @@ CRITICAL RULES:
 OUTPUT: Only return the translated text with identical formatting. Do not include any instructions, explanations, or extra text. Only return the result."""
 
 
-def translate_english_to_vietnamese(text: str, model: str = "gpt-4", api_key: str = None) -> str:
+def translate_english_to_vietnamese(text: str, model: str = "openai/gpt-oss-120b", api_key: str = None) -> str:
     """
     Translate English text to Vietnamese using OpenAI LLM.
 
@@ -191,7 +191,7 @@ def translate_english_to_vietnamese(text: str, model: str = "gpt-4", api_key: st
     if api_key:
         openai.api_key = os.getenv("OPENAI_API_KEY")
     try:
-        client = openai.OpenAI(api_key=api_key)
+        client = openai.OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
         response = client.chat.completions.create(
             model=model,
             messages=[
