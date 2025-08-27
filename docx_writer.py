@@ -51,6 +51,7 @@ class DocxWriter:
             ('CustomTableHeader', {'font_name': 'Times New Roman', 'font_size': 10, 'bold': True, 'space_after': 3})
         ]
         
+<<<<<<< HEAD
         # Create all styles
         for style_name, config in styles_config:
             style = self.document.styles.add_style(style_name, WD_STYLE_TYPE.PARAGRAPH)
@@ -62,6 +63,64 @@ class DocxWriter:
                 style.font.italic = True
             if has_space_after and hasattr(style, 'space_after'):
                 style.space_after = Pt(config['space_after'])
+=======
+        # Title style
+        title_style = self.document.styles.add_style('CustomTitle', WD_STYLE_TYPE.PARAGRAPH)
+        title_style.font.size = Pt(14)
+        title_style.font.bold = True
+        if has_space_after and hasattr(title_style, 'space_after'):
+            title_style.space_after = Pt(10)
+        
+        # Normal text style
+        normal_style = self.document.styles.add_style('CustomNormal', WD_STYLE_TYPE.PARAGRAPH)
+        normal_style.font.size = Pt(12)
+        if has_space_after and hasattr(normal_style, 'space_after'):
+            normal_style.space_after = Pt(6)
+        
+        # Footer style
+        footer_style = self.document.styles.add_style('CustomFooter', WD_STYLE_TYPE.PARAGRAPH)
+        footer_style.font.size = Pt(9)
+        footer_style.font.italic = True
+        if has_space_after and hasattr(footer_style, 'space_after'):
+            footer_style.space_after = Pt(6)
+        
+        # Table header style
+        table_header_style = self.document.styles.add_style('CustomTableHeader', WD_STYLE_TYPE.PARAGRAPH)
+        table_header_style.font.size = Pt(10)
+        table_header_style.font.bold = True
+        if has_space_after and hasattr(table_header_style, 'space_after'):
+            table_header_style.space_after = Pt(3)
+    
+    def initialize_document_for_incremental_writing(self, total_chunks: int, title: str = "", 
+                                                   source_lang: str = "English", target_lang: str = "Vietnamese"):
+        """Initialize the document for incremental chunk writing."""
+        self.total_chunks = total_chunks
+        self.completed_chunks = 0
+        
+        # Add metadata
+        self.add_metadata(
+            title=title or f"Translated Document ({source_lang} -> {target_lang})",
+            author="PDF Translator App",
+            subject=f"Translation from {source_lang} to {target_lang}"
+        )
+        
+        # Add document header
+        header = self.document.add_heading(f"Translated Document", level=1)
+        header.style = self.document.styles['CustomTitle']
+        
+        # Add translation info
+        info_para = self.document.add_paragraph(f"Translation: {source_lang} → {target_lang}")
+        info_para.style = self.document.styles['CustomNormal']
+        
+        # Add progress placeholder that we'll update
+        self.progress_paragraph = self.document.add_paragraph(f"Translation Progress: 0/{total_chunks} chunks completed")
+        self.progress_paragraph.style = self.document.styles['CustomNormal']
+        
+        # Add separator
+        self.document.add_paragraph("─" * 50).style = self.document.styles['CustomNormal']
+        
+        logger.info(f"Document initialized for incremental writing: {total_chunks} chunks expected")
+>>>>>>> abe398135b71f2411f2cf93cf5dfa852bab1004e
     
     def write_chunk(self, translated_text: str = None, chunk_type: str = "text"):
         """Write a single translated chunk to the document and save immediately."""
@@ -80,7 +139,10 @@ class DocxWriter:
             # ✅ FIXED: Save after EVERY chunk to ensure immediate persistence
             if self.output_path:
                 self._save_incremental_progress()
+<<<<<<< HEAD
                 
+=======
+>>>>>>> abe398135b71f2411f2cf93cf5dfa852bab1004e
         except Exception as e:
             raise
     
