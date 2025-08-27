@@ -1,0 +1,15 @@
+# PDF Processing Libraries
+# Choose one or both depending on your needs
+
+# PyPDF2 - Lightweight PDF library (recommended for basic operations)
+PyPDF2>=3.0.0
+
+# PyMuPDF (fitz) - Advanced PDF library with better text extraction and image support
+PyMuPDF>=1.23.0
+
+# Alternative: pypdf (newer fork of PyPDF2)
+# pypdf>=3.0.0
+
+# Optional: Additional dependencies for enhanced functionality
+# Pillow>=9.0.0  # For image processing if needed
+# reportlab>=3.6.0  # For PDF creation if needed
