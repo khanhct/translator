@@ -4,7 +4,7 @@ Example script demonstrating PDF splitting functionality.
 """
 
 import os
-import sys
+
 from pdf_utils import PDFSplitter
 
 

@@ -16,6 +16,39 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def _process_text_buffer(text_buffer: str) -> tuple[str, str]:
+    """
+    Process text buffer to handle sentence boundaries intelligently.
+
+    Args:
+        text_buffer (str): Text to process
+
+    Returns:
+        tuple[str, str]: (complete_text, remaining_incomplete_text)
+    """
+    if not text_buffer or text_buffer.rstrip().endswith(('.', '!', '?')):
+        # Text is complete or already ends with sentence ending
+        return text_buffer, ""
+
+    # Find the last complete sentence
+    # Use a more robust regex to find sentence endings
+    sentence_pattern = r'([.!?])\s+'
+    matches = list(re.finditer(sentence_pattern, text_buffer))
+
+    if not matches:
+        # No sentence endings found, return entire text as incomplete
+        return "", text_buffer
+
+    # Get the position of the last sentence ending
+    last_match = matches[-1]
+    complete_end = last_match.end()
+
+    # Split into complete and incomplete parts
+    complete_text = text_buffer[:complete_end].rstrip()
+    remaining_text = text_buffer[complete_end:].strip()
+
+    return complete_text, remaining_text
+
 class Translator:
     """A class for translating PDF documents from English to Vietnamese."""
 
@@ -119,7 +152,7 @@ class Translator:
             if current_page % 2 == 0:
                 if text_buffer:
                     # Process text buffer and handle sentence boundaries
-                    text_buffer, remaining_text = self._process_text_buffer(text_buffer)
+                    text_buffer, remaining_text = _process_text_buffer(text_buffer)
                     
                     # Translate and write complete text
                     if text_buffer:
@@ -149,47 +182,14 @@ class Translator:
                 text_buffer += "\n" + element.text
             elif category in ["NarrativeText", "UncategorizedText"]:
                 text_buffer = f"{text_buffer} {element.text}"
-            else:
-                text_buffer = f"{text_buffer} {element.text}"
+            elif category in [ 'PageBreak']:
+                pass
         
         # Process any remaining text
         if text_buffer.strip():
             translated_text = self.translate_english_to_vietnamese(text_buffer)
             if translated_text:
                 docx_writer.write_chunk(translated_text=translated_text)
-    
-    def _process_text_buffer(self, text_buffer: str) -> tuple[str, str]:
-        """
-        Process text buffer to handle sentence boundaries intelligently.
-        
-        Args:
-            text_buffer (str): Text to process
-            
-        Returns:
-            tuple[str, str]: (complete_text, remaining_incomplete_text)
-        """
-        if not text_buffer or text_buffer.rstrip().endswith(('.', '!', '?')):
-            # Text is complete or already ends with sentence ending
-            return text_buffer, ""
-        
-        # Find the last complete sentence
-        # Use a more robust regex to find sentence endings
-        sentence_pattern = r'([.!?])\s+'
-        matches = list(re.finditer(sentence_pattern, text_buffer))
-        
-        if not matches:
-            # No sentence endings found, return entire text as incomplete
-            return "", text_buffer
-        
-        # Get the position of the last sentence ending
-        last_match = matches[-1]
-        complete_end = last_match.end()
-        
-        # Split into complete and incomplete parts
-        complete_text = text_buffer[:complete_end].rstrip()
-        remaining_text = text_buffer[complete_end:].strip()
-        
-        return complete_text, remaining_text
 
     def chunk_text_semantically(self, text: str) -> List[str]:
         """
@@ -225,21 +225,6 @@ class Translator:
         except Exception as e:
             logger.error(f"Error during semantic chunking: {str(e)}")
             raise Exception(f"Failed to chunk text semantically: {str(e)}")
-
-    def _get_translation_prompt(self, source_lang: str = "English", target_lang: str = "Vietnamese") -> str:
-        """Generate the system prompt for translation."""
-        return f"""You are a professional translator. Translate the following text from {source_lang} to {target_lang}.
-
-CRITICAL RULES:
-- TRANSLATE ONLY. Do not add explanations, summaries, or commentary
-- Preserve exact formatting: line breaks, paragraphs, bullet points, lists
-- Keep ALL text in parentheses ( ) unchanged - DO NOT translate
-- Preserve numbers, dates, mathematical expressions exactly
-- Maintain original structure and layout
-- Use proper {target_lang} grammar and vocabulary
-- Keep technical terms accurate and appropriate for {target_lang}
-
-OUTPUT: Only return the translated text with identical formatting. Do not include any instructions, explanations, or extra text. Only return the result."""
 
     def translate_english_to_vietnamese(self, text: str) -> Optional[str]:
         """
@@ -293,59 +278,6 @@ OUTPUT: Only return the translated text with identical formatting. Do not includ
             logger.error(f"OpenAI translation failed: {str(e)}")
             return None
 
-    def translate_text(self, text: str, source_lang: str = "English", target_lang: str = "Vietnamese") -> Optional[str]:
-        """
-        Generic text translation method.
-        
-        Args:
-            text (str): Text to translate
-            source_lang (str): Source language
-            target_lang (str): Target language
-            
-        Returns:
-            Optional[str]: Translated text or None if failed
-        """
-        if target_lang.lower() == "vietnamese" and source_lang.lower() == "english":
-            return self.translate_english_to_vietnamese(text)
-        else:
-            # For other language pairs, use generic translation
-            return self._translate_generic(text, source_lang, target_lang)
-
-    def _translate_generic(self, text: str, source_lang: str, target_lang: str) -> Optional[str]:
-        """
-        Generic translation method for non-English-to-Vietnamese translations.
-        
-        Args:
-            text (str): Text to translate
-            source_lang (str): Source language
-            target_lang (str): Target language
-            
-        Returns:
-            Optional[str]: Translated text or None if failed
-        """
-        if not self.client:
-            logger.error("No OpenAI client available. Check API key.")
-            return None
-
-        try:
-            prompt = self._get_translation_prompt(source_lang, target_lang)
-
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": prompt},
-                    {"role": "user", "content": f"Translate this text from {source_lang} to {target_lang}: {text}"}
-                ],
-                max_tokens=4000,
-                temperature=0.3
-            )
-            return response.choices[0].message.content.strip()
-
-        except Exception as e:
-            logger.error(f"Generic translation failed: {str(e)}")
-            return None
-
-
 # Convenience functions for backward compatibility
 def partition_pdf_file(pdf_path: str, **kwargs) -> List[Dict[str, Any]]:
     """Backward compatibility function."""
@@ -363,17 +295,3 @@ def translate_english_to_vietnamese(text: str, **kwargs) -> Optional[str]:
     """Backward compatibility function."""
     translator = Translator(**kwargs)
     return translator.translate_english_to_vietnamese(text)
-
-
-if __name__ == "__main__":
-    # Example usage
-    translator = Translator()
-
-    # Example: Translate a simple text
-    text = "Hello, how are you today?"
-    translated = translator.translate_english_to_vietnamese(text)
-    print(f"Original: {text}")
-    print(f"Translated: {translated}")
-
-    # Example: Process a PDF file
-    # translator.partition_pdf_file("example.pdf", output_path="translated_output.docx")
